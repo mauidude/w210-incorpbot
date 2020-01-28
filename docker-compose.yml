@@ -1,0 +1,37 @@
+version: "3.7"
+
+services:
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      - "discovery.type=single-node"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
+  setup:
+    build: .
+    depends_on:
+      - elastic
+    command: >
+      bash -c "./scripts/wait.py --host=elastic && ./scripts/create_index.py --host=elastic --name=documents --file=data/elasticsearch/index.json && ./scripts/insert.py --host=elastic --index=documents --file=data/ca.json"
+
+  query:
+    build: .
+    stdin_open: true
+    tty: true
+    depends_on:
+      - elastic
+    command: >
+      bash -c "./scripts/query.py --host=elastic --index=documents --model_name_or_path=$${MODEL_CACHE}/incorpbot/$${INCORPBOT_MODEL} --verbose_logging"
+
+volumes:
+  esdata:
+    driver: local

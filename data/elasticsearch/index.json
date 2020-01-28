@@ -1,0 +1,30 @@
+{
+    "settings": {},
+    "mappings": {
+        "properties": {
+            "text": {
+                "type": "text",
+                "index": true,
+                "store": true
+            },
+            "state": {
+                "type": "keyword",
+                "index": true,
+                "store": true
+            },
+            "source": {
+                "type": "keyword",
+                "index": false,
+                "store": true
+            },
+            "avg_embeddings": {
+                "type": "dense_vector",
+                "dims": 768
+            },
+            "max_embeddings": {
+                "type": "dense_vector",
+                "dims": 768
+            }
+        }
+    }
+}
