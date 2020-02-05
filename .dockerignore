@@ -6,3 +6,4 @@ __pycache__
 *.md
 data/models
 .DS_Store
+app/

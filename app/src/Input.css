@@ -1,0 +1,17 @@
+.Input {
+    padding: 5px;
+    min-height: 42px;
+}
+
+.Input .form-inline {
+    flex-direction: row;
+    width: 100%;
+}
+
+.Input .form-control {
+    flex-grow: 1;
+}
+
+.Input .btn {
+    width: 50px;
+}

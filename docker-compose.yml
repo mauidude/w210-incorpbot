@@ -23,6 +23,28 @@ services:
     command: >
       bash -c "./scripts/wait.py --host=elastic && ./scripts/create_index.py --host=elastic --name=documents --file=data/elasticsearch/index.json && ./scripts/insert.py --host=elastic --index=documents --file=data/ca.json"
 
+  app:
+    build: ./app
+    working_dir: /home/node/app
+    volumes:
+      - ./app/src:/home/node/app/src
+    ports:
+      - 3000:3000
+    command: "npm start"
+
+  flask:
+    build: .
+    depends_on:
+      - elastic
+    ports:
+      - 5000:5000
+    environment:
+      - FLASK_APP=app
+      - ELASTIC_HOST=elastic
+      - ELASTIC_INDEX=documents
+    command: >
+      bash -c "MODEL_NAME_OR_PATH=$${MODEL_CACHE}/incorpbot/$${INCORPBOT_MODEL} flask run --host=0.0.0.0"
+
   query:
     build: .
     stdin_open: true

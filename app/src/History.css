@@ -1,0 +1,8 @@
+.History {
+    width: 100%;
+    background: #ccc;
+    margin: 0 auto;
+    overflow: scroll;
+    padding: 5px;
+    flex-grow: 1;
+}

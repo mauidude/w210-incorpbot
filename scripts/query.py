@@ -33,7 +33,15 @@ MODEL_CLASSES = {
 }
 
 
-def query(es,
+def cli(*args, **kwargs):
+    while True:
+        user_input = input('Enter your query:\n')
+        answer = query(user_input, *args, **kwargs)
+        print('Answer: ', answer)
+
+
+def query(q,
+          es,
           index,
           sent_model,
           config,
@@ -48,104 +56,102 @@ def query(es,
           max_answer_length,
           device,
           verbose_logging):
-    while True:
-        user_input = input('Enter your query:\n')
 
-        embeddings = sent_model.encode([user_input])
+    embeddings = sent_model.encode([q])
 
-        query = {
-            'from': 0,
-            'size': 10,
-            'query': {
-                'script_score': {
-                    'query': {
-                        'match_all': {}
-                    },
-                    'script': {
-                        'source': "cosineSimilarity(params.query_vector, doc['max_embeddings']) + 1.0",
-                        'params': {
-                            'query_vector': embeddings[0].tolist()
-                        }
+    query = {
+        'from': 0,
+        'size': 10,
+        'query': {
+            'script_score': {
+                'query': {
+                    'match_all': {}
+                },
+                'script': {
+                    'source': "cosineSimilarity(params.query_vector, doc['max_embeddings']) + 1.0",
+                    'params': {
+                        'query_vector': embeddings[0].tolist()
                     }
                 }
             }
         }
+    }
 
-        results = es.search(index=index, body=query)
-        print(
-            f"found {results['hits']['total']['value']} results in {results['took']} ms")
+    results = es.search(index=index, body=query)
+    print(
+        f"found {results['hits']['total']['value']} results in {results['took']} ms")
 
-        for i, result in enumerate(results['hits']['hits']):
-            document = result['_source']
-            score = result['_score']
+    for i, result in enumerate(results['hits']['hits']):
+        document = result['_source']
+        score = result['_score']
 
-            if verbose_logging:
-                print(f'Result {i} {score}:')
-                print(document['text'])
-                print('-' * 50)
+        if verbose_logging:
+            print(f'Result {i} {score}:')
+            print(document['text'])
+            print('-' * 50)
 
-        context = '\n'.join([
-            result['_source']['text']
-            for result in results['hits']['hits']
-        ])
+    context = '\n'.join([
+        result['_source']['text']
+        for result in results['hits']['hits']
+    ])
 
-        example_id = '55555'
-        example = SquadExample(example_id,
-                               user_input,
-                               context,
-                               None,
-                               None,
-                               None,
-                               )
+    example_id = '55555'
+    example = SquadExample(example_id,
+                           q,
+                           context,
+                           None,
+                           None,
+                           None,
+                           )
 
-        features, dataset = squad_convert_examples_to_features(
-            [example], tokenizer, max_seq_length, doc_stride, max_query_length, False, return_dataset='pt')
+    features, dataset = squad_convert_examples_to_features(
+        [example], tokenizer, max_seq_length, doc_stride, max_query_length, False, return_dataset='pt')
 
-        sampler = SequentialSampler(dataset)
-        dataloader = DataLoader(dataset, sampler=sampler, batch_size=1)
+    sampler = SequentialSampler(dataset)
+    dataloader = DataLoader(dataset, sampler=sampler, batch_size=1)
 
-        all_results = []
-        for batch in dataloader:
-            model.eval()
-            batch = tuple(t.to(device) for t in batch)
+    all_results = []
+    for batch in dataloader:
+        model.eval()
+        batch = tuple(t.to(device) for t in batch)
 
-            with torch.no_grad():
-                inputs = {
-                    "input_ids": batch[0],
-                    "attention_mask": batch[1],
-                    "token_type_ids": batch[2],
-                }
+        with torch.no_grad():
+            inputs = {
+                "input_ids": batch[0],
+                "attention_mask": batch[1],
+                "token_type_ids": batch[2],
+            }
 
-                example_index = batch[3]
+            example_index = batch[3]
 
-                outputs = model(**inputs)
-                outputs = [output.detach().cpu().tolist()
-                           for output in outputs]
-                start_logits, end_logits = outputs
+            outputs = model(**inputs)
+            outputs = [output.detach().cpu().tolist()
+                       for output in outputs]
+            start_logits, end_logits = outputs
 
-                unique_id = int(features[example_index].unique_id)
+            unique_id = int(features[example_index].unique_id)
 
-                squad_result = SquadResult(
-                    unique_id, start_logits[0], end_logits[0])
+            squad_result = SquadResult(
+                unique_id, start_logits[0], end_logits[0])
 
-                all_results.append(squad_result)
+            all_results.append(squad_result)
 
-        predictions = compute_predictions_logits(
-            [example],
-            features,
-            all_results,
-            n_best_size,
-            max_answer_length,
-            do_lower_case,
-            '/tmp/pred.out',
-            '/tmp/nbest.out',
-            '/tmp/null.out',
-            True,
-            False,
-            0,
-        )
+    predictions = compute_predictions_logits(
+        [example],
+        features,
+        all_results,
+        n_best_size,
+        max_answer_length,
+        do_lower_case,
+        '/tmp/pred.out',
+        '/tmp/nbest.out',
+        '/tmp/null.out',
+        True,
+        False,
+        0,
+    )
 
-        print('Answer: ', predictions[example_id])
+    return predictions[example_id]
 
 
 if __name__ == '__main__':
@@ -178,8 +184,8 @@ if __name__ == '__main__':
                         help='the path to the Q&A model')
 
     parser.add_argument('--cache_dir', default='', type=str,
-                        help='where to store the pretrained model after downloading',
-                        )
+                        help='where to store the pretrained model after downloading')
+
     parser.add_argument(
         "--max_seq_length",
         default=384,
@@ -248,18 +254,18 @@ if __name__ == '__main__':
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    query(es,
-          args.index,
-          sent_model,
-          config,
-          tokenizer,
-          model,
-          args.max_seq_length,
-          args.doc_stride,
-          args.max_query_length,
-          args.model_type,
-          args.do_lower_case,
-          args.n_best_size,
-          args.max_answer_length,
-          device,
-          args.verbose_logging)
+    cli(es,
+        args.index,
+        sent_model,
+        config,
+        tokenizer,
+        model,
+        args.max_seq_length,
+        args.doc_stride,
+        args.max_query_length,
+        args.model_type,
+        args.do_lower_case,
+        args.n_best_size,
+        args.max_answer_length,
+        device,
+        args.verbose_logging)

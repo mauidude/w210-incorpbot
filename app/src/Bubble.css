@@ -1,0 +1,163 @@
+.Bubble {
+    background-color: #5fc9f8;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    clear: both;
+    max-width: 60%;
+    margin-bottom: 5px;
+    font-size: smaller;
+    animation-name: bubble-appear;
+    animation-duration: .75s;
+}
+
+@keyframes bubble-appear {
+    from {opacity: 0;}
+    to {opacity: 1;}
+  }
+
+.Bubble-me {
+    float: right;
+    text-align: right;
+}
+
+.Bubble-you {
+    float: left;
+    background-color: #909090;
+    text-align: left;
+}
+
+.PendingBubble{
+    height: 25px;
+    width: 16px;
+    background: #e5e5e5;
+    position: relative;
+    margin: 0 20px 5px 20px;
+    float: left;
+    clear: both;
+}
+
+.PendingBubble:before{
+    content: '';
+    height: 25px;
+    width: 25px;
+    left: -13px;
+    position: absolute;
+    display: block;
+    background: #e5e5e5;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.PendingBubble:after{
+    content: '';
+    height: 25px;
+    width: 25px;
+    right: -13px;
+    position: absolute;
+    display: block;
+    background: #e5e5e5;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.PendingBubble .tail{
+      height: 13px;
+      width: 13px;
+      background: #e5e5e5;
+      position: absolute;
+      left: -15px;
+      bottom: -2px;
+      border-radius: 50%;
+}
+
+.PendingBubble .tail:before{
+    height: 6px;
+    width: 6px;
+    background: #e5e5e5;
+    content: '';
+    display: block;
+    border-radius: 50%;
+    position: absolute;
+    left: -5px;
+    bottom: -3px;
+}
+
+.PendingBubble .loading{
+    position: absolute;
+    z-index: 10;
+    width: 30px;
+    left: -2px;
+    top: 10px;
+}
+
+.PendingBubble .dot {
+    height: 6px;
+    width: 6px;
+    border-radius: 50%;
+    background: #c1c1c1;
+    display: block;
+    float: left;
+    margin: 0 0 0 2px;
+}
+
+.PendingBubble .dot:first-child{
+    margin: 0;
+}
+.PendingBubble .one{
+    animation: cycleOne 1s ease-in-out infinite;
+    animation-direction: normal;
+}
+.PendingBubble .two{
+    animation: cycleTwo 1s ease-in-out infinite;
+    animation-direction: normal;
+}
+.PendingBubble .three{
+    animation: cycleThree 1s ease-in-out infinite;
+    animation-direction: normal;
+}
+
+@keyframes cycleOne{
+    0%{
+        background: rgba(150, 150, 150, 0.4);
+    }
+    33.333%{
+        background: rgba(150, 150, 150, 1);
+    }
+    66.6667%{
+        background: rgba(150, 150, 150, 0.4);
+    }
+    100%{
+        background: rgba(150, 150, 150, 0.4);
+    }
+}
+
+@keyframes cycleTwo{
+    0%{
+        background: rgba(150, 150, 150, 0.4);
+    }
+    33.333%{
+        background: rgba(150, 150, 150, 0.4);
+    }
+    66.6667%{
+        background: rgba(150, 150, 150, 1);
+    }
+    100%{
+        background: rgba(150, 150, 150, 0.4);
+    }
+}
+
+@keyframes cycleThree{
+    0%{
+        background: rgba(150, 150, 150, 0.4);
+    }
+    33.333%{
+        background: rgba(150, 150, 150, 0.4);
+    }
+    66.6667%{
+        background: rgba(150, 150, 150, 0.4);
+    }
+    100%{
+        background: rgba(150, 150, 150, 1);
+    }
+}

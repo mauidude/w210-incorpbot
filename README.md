@@ -27,13 +27,13 @@ docker-compose build
 
 ## Running
 
-To run Incorpbot after you've successfully installed it, simply run the following command:
+To run Incorpbot after you've successfully installed it, simply run the following command to start the web server:
 
 ```bash
-docker-compose run query
+docker-compose up flask app
 ```
 
-You can now ask questions once you see the prompt to enter your question.
+You can point your browser to http://localhost:5000 to visit the site.
 
 ## Contributing
 
