@@ -1,17 +1,21 @@
 import logging
 import os
+import pickle
+import random
 import time
 
 import elasticsearch
-import torch
-from flask import Flask, render_template
+import numpy as np
+from flask import Flask
 from flask_socketio import SocketIO, emit
 from sentence_transformers import SentenceTransformer
 
-from scripts.query import MODEL_CLASSES, query
+from src import ir
+from src.models import intent, qa
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
+
 
 configs = {
     'ELASTIC_HOST': None,
@@ -28,7 +32,9 @@ configs = {
     'DO_LOWER_CASE': True,
     'N_BEST_SIZE': 20,
     'MAX_ANSWER_LENGTH': 30,
-    'VERBOSE_LOGGING': True
+    'VERBOSE_LOGGING': True,
+    'INTENT_MODEL': 'https://storage.googleapis.com/w210-incorpbot/models/intent/intent_model.pkl',
+    'WORD_EMBEDDING_MODEL': 'glove/medium/glove.6B.100d.magnitude'
 }
 
 for cfg, default in configs.items():
@@ -38,33 +44,83 @@ for cfg, default in configs.items():
         raise Exception(f'missing environment variable {cfg}')
 
 
+# intent mdoel for classifying user's intent so we properly respond to their input
+intent_model = intent.Model(
+    configs['INTENT_MODEL'], configs['WORD_EMBEDDING_MODEL'])
+
 nodes = [f"{configs['ELASTIC_HOST']}:{configs['ELASTIC_PORT']}"]
 es = elasticsearch.Elasticsearch(
     nodes, timeout=int(configs['ELASTIC_TIMEOUT']))
 
+# sentence model for getting sentence embeddings during retrieval
 sent_model = SentenceTransformer(configs['SENT_MODEL_NAME'])
 
-config_class, model_class, tokenizer_class = MODEL_CLASSES[configs['MODEL_TYPE']]
+# retriever for fetching relevant documents from elastic search
+retriever = ir.Retriever(es, sent_model, configs['ELASTIC_INDEX'])
 
-model_name_or_path = configs['MODEL_NAME_OR_PATH']
-config = config_class.from_pretrained(
-    model_name_or_path,
-    cache_dir=None
-)
+# qa model for finding best answer for a question in a context paragraph
+qa_model = qa.Model(configs['MODEL_NAME_OR_PATH'],
+                    model_type=configs['MODEL_TYPE'],
+                    do_lower_case=bool(configs['DO_LOWER_CASE']),
+                    max_seq_length=int(configs['MAX_SEQ_LENGTH']),
+                    doc_stride=int(configs['DOC_STRIDE']),
+                    max_query_length=int(configs['MAX_QUERY_LENGTH']),
+                    )
 
-tokenizer = tokenizer_class.from_pretrained(
-    model_name_or_path,
-    do_lower_case=bool(configs['DO_LOWER_CASE']),
-    cache_dir=None,
-)
 
-model = model_class.from_pretrained(
-    model_name_or_path,
-    from_tf=bool(".ckpt" in model_name_or_path),
-    config=config,
-    cache_dir=None,
-)
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+def handle_greeting(text):
+    return np.random.choice([
+        'Hello!',
+        'Howdy! Welcome to Incorpbot!',
+        'Welcome! What can I help you with?'
+    ])
+
+
+def handle_help(text):
+    return np.random.choice([
+        'Ask me a question about your legal needs!',
+    ])
+
+
+def handle_other(text):
+    return np.random.choice([
+        "Hmmm... I don't think I can help you with that.",
+        'I am not sure I understand.'
+    ])
+
+
+def handle_question(text):
+    context = retriever.retrieve(text)
+
+    return qa_model.find_answer(text,
+                                context,
+                                n_best_size=int(configs['N_BEST_SIZE']),
+                                max_answer_length=int(configs['MAX_ANSWER_LENGTH']))
+
+
+def handle_sendoff(text):
+    return np.random.choice([
+        'Thanks for visiting!',
+        'Bye!',
+        'Come back soon!'
+    ])
+
+
+def handle_thanks(text):
+    return np.random.choice([
+        'Glad to be of service!',
+        'Thank you for letting me help!'
+    ])
+
+
+intent_responses = [
+    handle_greeting,
+    handle_help,
+    handle_other,
+    handle_question,
+    handle_sendoff,
+    handle_thanks
+]
 
 
 @socketio.on('conversation:new')
@@ -75,25 +131,11 @@ def conversation_new():
 
 @socketio.on('conversation:message')
 def conversation_mesage(payload):
-    answer = query(payload['message'],
-                   es,
-                   configs['ELASTIC_INDEX'],
-                   sent_model,
-                   config,
-                   tokenizer,
-                   model,
-                   int(configs['MAX_SEQ_LENGTH']),
-                   int(configs['DOC_STRIDE']),
-                   int(configs['MAX_QUERY_LENGTH']),
-                   configs['MODEL_TYPE'],
-                   bool(configs['DO_LOWER_CASE']),
-                   int(configs['N_BEST_SIZE']),
-                   int(configs['MAX_ANSWER_LENGTH']),
-                   device,
-                   bool(configs['VERBOSE_LOGGING'])
-                   )
+    msg = payload['message']
+    intent = intent_model.classify(msg)
+    response = intent_responses[intent](msg)
 
-    emit('conversation:response', {'message': answer})
+    emit('conversation:response', {'message': response})
 
 
 if __name__ == '__main__':

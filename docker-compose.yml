@@ -21,7 +21,7 @@ services:
     depends_on:
       - elastic
     command: >
-      bash -c "./scripts/wait.py --host=elastic && ./scripts/create_index.py --host=elastic --name=documents --file=data/elasticsearch/index.json && ./scripts/insert.py --host=elastic --index=documents --file=data/ca.json"
+      bash -c "python3 -m src.scripts.wait --host=elastic && ./scripts/create_index.py --host=elastic --name=documents --file=data/elasticsearch/index.json && python3 -m src.scripts.insert --host=elastic --index=documents --file=data/ca.json"
 
   app:
     build: ./app
@@ -43,7 +43,7 @@ services:
       - ELASTIC_HOST=elastic
       - ELASTIC_INDEX=documents
     command: >
-      bash -c "MODEL_NAME_OR_PATH=$${MODEL_CACHE}/incorpbot/$${INCORPBOT_MODEL} flask run --host=0.0.0.0"
+      bash -c "MODEL_NAME_OR_PATH=$${MODEL_CACHE}/incorpbot/$${INCORPBOT_MODEL} WORD_EMBEDDING_MODEL=$${MODEL_CACHE}/glove/$${GLOVE_MODEL} flask run --host=0.0.0.0"
 
   query:
     build: .
@@ -52,7 +52,7 @@ services:
     depends_on:
       - elastic
     command: >
-      bash -c "./scripts/query.py --host=elastic --index=documents --model_name_or_path=$${MODEL_CACHE}/incorpbot/$${INCORPBOT_MODEL} --verbose_logging"
+      bash -c "python3 -m src.scripts.query --host=elastic --index=documents --model_name_or_path=$${MODEL_CACHE}/incorpbot/$${INCORPBOT_MODEL} --verbose_logging"
 
 volumes:
   esdata:

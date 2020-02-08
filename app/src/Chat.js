@@ -29,16 +29,14 @@ class Chat extends React.Component {
 
         setTimeout(() => {
             this.websocket.emit('conversation:new');
-        }, 2000);
+        }, 1000);
     }
 
     sendMessage(msg) {
         this.setState({ history: [...this.state.history, { message: msg, sender: "me" }] });
-        this.websocket.emit('conversation:message', { message: msg });
+        this.setState({ pending: true });
 
-        setTimeout(() => {
-            this.setState({ pending: true })
-        }, 500);
+        this.websocket.emit('conversation:message', { message: msg });
     }
 
     receiveMessage(data) {

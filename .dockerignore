@@ -7,3 +7,4 @@ __pycache__
 data/models
 .DS_Store
 app/
+.ipynb_checkpoints

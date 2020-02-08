@@ -1,0 +1,50 @@
+Hello,greeting
+Hi,greeting
+How are you?,greeting
+What's up?,greeting
+I have a question.,help
+I need help.,help
+What can you do?,help
+What can I ask you?,help
+Help me,help
+Help,help
+Thank you,thanks
+Thanks,thanks
+You've been very helpful!,thanks
+Great job,thanks
+Bye,sendoff
+Goodbye,sendoff
+Thank you goodbye,sendoff
+See you later,sendoff
+What's the difference between an LLC and corporation?,question
+Where do I file forms for incorporation?,question
+What is the deadline for submitting my taxes?,question
+"Hello, I have a question about my startup.",help
+"Hi, where do I file for a tax exemption?",question
+Howdy,greeting
+You suck,other
+What color is the sky,other
+What is the opposite of good?,other
+Who is the president?,other
+What year is it?,other
+How do I file my forms?,question
+Who can I contact about incorporation?,question
+Which states can I operate my business in?,question
+What do I need to do to do forgein business?,question
+yo,greeting
+"Hello, I would like to know more about forming a business entity.",question
+What can I do to get investors?,question
+What do I need to do to form a corporation?,question
+"For a company that is less than 10 people, should I form an LLC or remain an s-corp?",question
+What is the weather in San Francisco today?,other
+Where are you from?,other
+Do I need to file taxes in multiple states if I do business in those states?,question
+What do I do if someone has filed a complaint at the better business bureau?,question
+Later,sendoff
+Do I need to notify the secretary of state of my business name change?,question
+"If I want to file my taxes, should I do it sooner or later?",question
+You have helped me so much!,thanks
+You really helped me,thanks
+Thanks a lot!,thanks
+Thank you for helping me,thanks
+Where can I get help with incorporation?,question

@@ -1,5 +1,7 @@
 FROM python:3.7
 
+RUN pip3 install --no-cache-dir torch==1.4.0 pymagnitude==0.1.120
+
 ENV MODEL_CACHE=/root/.cache/torch
 
 # download sentence transformer model
@@ -16,10 +18,14 @@ RUN curl -O https://storage.googleapis.com/w210-incorpbot/models/${INCORPBOT_MOD
     unzip -d ${INCORPBOT_MODEL} ${INCORPBOT_MODEL} && \
     rm -rf ${INCORPBOT_MODEL}.zip
 
+WORKDIR ${MODEL_CACHE}/glove/
+ENV GLOVE_MODEL=glove.6B.100d.magnitude
+RUN curl -O http://magnitude.plasticity.ai/glove/medium/${GLOVE_MODEL}
+
 WORKDIR /user/src/app
 
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 # install nltk tokenizer
 RUN python3 -c "import nltk; nltk.download('punkt')"
