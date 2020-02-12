@@ -6,9 +6,9 @@ import time
 
 import elasticsearch
 import numpy as np
+import tensorflow_hub as hub
 from flask import Flask
 from flask_socketio import SocketIO, emit
-from sentence_transformers import SentenceTransformer
 
 from src import ir
 from src.models import intent, qa
@@ -21,10 +21,11 @@ configs = {
     'ELASTIC_HOST': None,
     'ELASTIC_PORT': '9200',
     'ELASTIC_TIMEOUT': '300',
-    'SENT_MODEL_NAME': 'bert-base-nli-stsb-mean-tokens',
+    'SENTENCE_EMBEDDING_MODEL': None,
     'MODEL_TYPE': 'bert',
     'MODEL_NAME_OR_PATH': 'https://storage.googleapis.com/w210-incorpbot/models/squad-1.0/',
     'ELASTIC_INDEX': 'documents',
+    'ELASTIC_INTENT_INDEX': 'classes',
     'MAX_SEQ_LENGTH': 384,
     'DOC_STRIDE': 128,
     'MAX_QUERY_LENGTH': 64,
@@ -33,32 +34,34 @@ configs = {
     'N_BEST_SIZE': 20,
     'MAX_ANSWER_LENGTH': 30,
     'VERBOSE_LOGGING': True,
-    'INTENT_MODEL': 'https://storage.googleapis.com/w210-incorpbot/models/intent/intent_model.pkl',
-    'WORD_EMBEDDING_MODEL': 'glove/medium/glove.6B.100d.magnitude'
 }
 
+print('Loading configs...')
 for cfg, default in configs.items():
     val = os.environ.get(cfg, default)
     configs[cfg] = val
     if val is None:
         raise Exception(f'missing environment variable {cfg}')
 
-
-# intent mdoel for classifying user's intent so we properly respond to their input
-intent_model = intent.Model(
-    configs['INTENT_MODEL'], configs['WORD_EMBEDDING_MODEL'])
-
+print('Initializing elasticsearch client...')
 nodes = [f"{configs['ELASTIC_HOST']}:{configs['ELASTIC_PORT']}"]
 es = elasticsearch.Elasticsearch(
     nodes, timeout=int(configs['ELASTIC_TIMEOUT']))
 
-# sentence model for getting sentence embeddings during retrieval
-sent_model = SentenceTransformer(configs['SENT_MODEL_NAME'])
+print('Loading sentence embedding model...')
+sent_embedding_model = hub.load(configs['SENTENCE_EMBEDDING_MODEL'])
 
 # retriever for fetching relevant documents from elastic search
-retriever = ir.Retriever(es, sent_model, configs['ELASTIC_INDEX'])
+print('Initializing retriever...')
+retriever = ir.Retriever(es, sent_embedding_model, configs['ELASTIC_INDEX'])
+
+# intent mdoel for classifying user's intent so we properly respond to their input
+print('Initializing intent model...')
+intent_model = intent.Model(
+    sent_embedding_model, es, configs['ELASTIC_INTENT_INDEX'])
 
 # qa model for finding best answer for a question in a context paragraph
+print('Initializing QA model...')
 qa_model = qa.Model(configs['MODEL_NAME_OR_PATH'],
                     model_type=configs['MODEL_TYPE'],
                     do_lower_case=bool(configs['DO_LOWER_CASE']),
@@ -79,6 +82,7 @@ def handle_greeting(text):
 def handle_help(text):
     return np.random.choice([
         'Ask me a question about your legal needs!',
+        "I'm here to help you with your legal questions! Ask away!"
     ])
 
 
@@ -113,14 +117,14 @@ def handle_thanks(text):
     ])
 
 
-intent_responses = [
-    handle_greeting,
-    handle_help,
-    handle_other,
-    handle_question,
-    handle_sendoff,
-    handle_thanks
-]
+intent_responses = {
+    'greeting': handle_greeting,
+    'help': handle_help,
+    'other': handle_other,
+    'question': handle_question,
+    'sendoff': handle_sendoff,
+    'thanks': handle_thanks
+}
 
 
 @socketio.on('conversation:new')
@@ -133,6 +137,7 @@ def conversation_new():
 def conversation_mesage(payload):
     msg = payload['message']
     intent = intent_model.classify(msg)
+
     response = intent_responses[intent](msg)
 
     emit('conversation:response', {'message': response})

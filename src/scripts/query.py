@@ -4,7 +4,7 @@ import argparse
 import logging
 
 import elasticsearch
-from sentence_transformers import SentenceTransformer
+import tensorflow_hub as hub
 
 from ..ir import Retriever
 from ..models.qa import MODEL_CLASSES, Model
@@ -100,10 +100,10 @@ if __name__ == '__main__':
     nodes = [f'{args.host}:{args.port}']
     es = elasticsearch.Elasticsearch(nodes, timeout=args.timeout)
 
-    sent_model = SentenceTransformer(args.sent_model_name)
+    sent_embedding_model = hub.load(configs['SENTENCE_EMBEDDING_MODEL'])
 
     # retriever for fetching relevant documents from elastic search
-    retriever = Retriever(es, sent_model, args.index)
+    retriever = Retriever(es, sent_embedding_model, args.index)
 
     # qa model for finding best answer for a question in a context paragraph
     qa_model = Model(args.model_name_or_path,

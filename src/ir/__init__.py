@@ -1,4 +1,3 @@
-import elasticsearch
 
 
 class Retriever(object):
@@ -11,9 +10,8 @@ class Retriever(object):
 
     def retrieve(self, text):
         # get sentence embeddings
-        embeddings = self.embedding_model.encode([text])
+        embeddings = self.embedding_model([text])[0].numpy()
 
-        # construct and issue query to elasticsearch
         query = {
             'from': 0,
             'size': self.max_records,
@@ -23,9 +21,9 @@ class Retriever(object):
                         'match_all': {}
                     },
                     'script': {
-                        'source': "cosineSimilarity(params.query_vector, doc['max_embeddings']) + 1.0",
+                        'source': f"cosineSimilarity(params.query_vector, doc['universal_sentence_embeddings']) + 1.0",
                         'params': {
-                            'query_vector': embeddings[0].tolist()
+                            'query_vector': embeddings.tolist()
                         }
                     }
                 }

@@ -5,39 +5,29 @@ import json
 import logging
 
 import elasticsearch
-import spacy
+import numpy as np
+import pandas as pd
 import tensorflow_hub as hub
 
-from ..models.embedding import Model
 
+def insert(es, index, model, df):
 
-def insert(es, index, model, nlp, data):
-    state = data['state']
+    for category, examples in df.groupby('category'):
+        centroid = np.mean(model(examples['input']).numpy(), axis=0)
 
-    for page in data['pages']:
-        source = page['source']
+        payload = {
+            'category': category,
+            'centroid': centroid.tolist(),
+        }
 
-        for paragraph in page['paragraphs']:
-            doc = nlp(paragraph)
-
-            for sentence in doc.sents:
-                embeddings = model.embedding(sentence.text)
-
-                payload = {
-                    'text': paragraph,
-                    'state': state,
-                    'source': source,
-                    'universal_sentence_embeddings': embeddings.tolist()
-                }
-
-                es.index(index=index, body=payload)
+        es.index(index=index, body=payload)
 
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 
     parser = argparse.ArgumentParser(
-        description='Inserts a record into Elasticsearch')
+        description='Inserts a classification record into Elasticsearch')
 
     parser.add_argument('--host', type=str, required=True,
                         help='the Elasticsearch host')
@@ -49,7 +39,7 @@ if __name__ == '__main__':
                         help='the index name')
 
     parser.add_argument('--file', type=str, required=True,
-                        help='the name of the JSON file')
+                        help='the name of the CSV file')
 
     parser.add_argument('--timeout', type=int, default=300,
                         help='the Elasticsearch timeout')
@@ -57,17 +47,13 @@ if __name__ == '__main__':
     parser.add_argument('--model', type=str, required=True,
                         help='the model name to use for the sentence embeddings. See https://tfhub.dev/google/collections/universal-sentence-encoder/1')
 
-    parser.add_argument('--spacy_model', type=str, required=True)
-
     args = parser.parse_args()
 
-    with open(args.file) as f:
-        index_cfg = json.load(f)
+    df = pd.read_csv(args.file)
 
-    model = Model(hub.load(args.model))
-    nlp = spacy.load(args.spacy_model)
+    model = hub.load(args.model)
 
     nodes = [f'{args.host}:{args.port}']
     es = elasticsearch.Elasticsearch(nodes, timeout=args.timeout)
 
-    insert(es, args.index,  model, nlp, index_cfg)
+    insert(es, args.index,  model, df)

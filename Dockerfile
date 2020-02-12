@@ -1,16 +1,8 @@
 FROM python:3.7
 
-RUN pip3 install --no-cache-dir torch==1.4.0 pymagnitude==0.1.120
+RUN pip3 install --no-cache-dir torch==1.4.0 tensorflow==2.1.0 spacy==2.2.3
 
 ENV MODEL_CACHE=/root/.cache/torch
-
-# download sentence transformer model
-ENV SENTENCE_TRANSFORMERS_MODEL=bert-base-nli-stsb-mean-tokens
-WORKDIR ${MODEL_CACHE}/sentence_transformers/
-RUN curl -O   \
-    https://public.ukp.informatik.tu-darmstadt.de/reimers/sentence-transformers/v0.2/${SENTENCE_TRANSFORMERS_MODEL}.zip && \
-    unzip -d public.ukp.informatik.tu-darmstadt.de_reimers_sentence-transformers_v0.2_${SENTENCE_TRANSFORMERS_MODEL}.zip ${SENTENCE_TRANSFORMERS_MODEL}.zip && \
-    rm -rf ${SENTENCE_TRANSFORMERS_MODEL}.zip
 
 WORKDIR ${MODEL_CACHE}/incorpbot/
 ENV INCORPBOT_MODEL=squad-1.0
@@ -18,9 +10,14 @@ RUN curl -O https://storage.googleapis.com/w210-incorpbot/models/${INCORPBOT_MOD
     unzip -d ${INCORPBOT_MODEL} ${INCORPBOT_MODEL} && \
     rm -rf ${INCORPBOT_MODEL}.zip
 
-WORKDIR ${MODEL_CACHE}/glove/
-ENV GLOVE_MODEL=glove.6B.100d.magnitude
-RUN curl -O http://magnitude.plasticity.ai/glove/medium/${GLOVE_MODEL}
+WORKDIR ${MODEL_CACHE}/use/
+ENV USE_MODEL=use4
+RUN curl -o ${USE_MODEL}.tar.gz https://storage.googleapis.com/tfhub-modules/google/universal-sentence-encoder/4.tar.gz && \
+    tar -xf ${USE_MODEL}.tar.gz && \
+    rm -rf ${USE_MODEL}.tar.gz
+
+ENV SPACY_MODEL=en_core_web_lg
+RUN python3 -m spacy download ${SPACY_MODEL}
 
 WORKDIR /user/src/app
 

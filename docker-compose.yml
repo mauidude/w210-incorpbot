@@ -21,7 +21,15 @@ services:
     depends_on:
       - elastic
     command: >
-      bash -c "python3 -m src.scripts.wait --host=elastic && ./scripts/create_index.py --host=elastic --name=documents --file=data/elasticsearch/index.json && python3 -m src.scripts.insert --host=elastic --index=documents --file=data/ca.json"
+      bash -c "
+        curl -X DELETE http://elastic:9200/documents && \
+        curl -X DELETE http://elastic:9200/classes && \
+        python3 -m src.scripts.wait --host=elastic &&
+        ./src/scripts/create_index.py --host=elastic --name=documents --file=data/elasticsearch/documents.json &&
+        ./src/scripts/create_index.py --host=elastic --name=classes --file=data/elasticsearch/classes.json &&
+        python3 -m src.scripts.insert --host=elastic --index=documents --file=data/ca.json --model=$${MODEL_CACHE}/use --spacy_model=$${SPACY_MODEL} &&
+        python3 -m src.scripts.classification --host=elastic --index=classes --file=data/dialog.csv --model=$${MODEL_CACHE}/use
+      "
 
   app:
     build: ./app
@@ -45,7 +53,7 @@ services:
       - ELASTIC_HOST=elastic
       - ELASTIC_INDEX=documents
     command: >
-      bash -c "MODEL_NAME_OR_PATH=$${MODEL_CACHE}/incorpbot/$${INCORPBOT_MODEL} WORD_EMBEDDING_MODEL=$${MODEL_CACHE}/glove/$${GLOVE_MODEL} flask run --host=0.0.0.0"
+      bash -c "MODEL_NAME_OR_PATH=$${MODEL_CACHE}/incorpbot/$${INCORPBOT_MODEL} SENTENCE_EMBEDDING_MODEL=$${MODEL_CACHE}/use flask run --host=0.0.0.0"
 
   query:
     build: .
