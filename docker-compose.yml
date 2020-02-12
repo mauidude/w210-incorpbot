@@ -30,6 +30,8 @@ services:
       - ./app/src:/home/node/app/src
     ports:
       - 3000:3000
+    environment:
+      - REACT_APP_SERVER=localhost:5000
     command: "npm start"
 
   flask:

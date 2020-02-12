@@ -20,7 +20,7 @@ class Chat extends React.Component {
     }
 
     componentDidMount() {
-        this.websocket = socketIOClient('http://localhost:5000');
+        this.websocket = socketIOClient(`http://${this.props.server}`);
         this.websocket.on('conversation:response', this.receiveMessage);
 
         this.setState({
