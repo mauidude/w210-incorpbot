@@ -1,11 +1,10 @@
 import logging
 import os
-import pickle
-import random
 import time
 
 import elasticsearch
 import numpy as np
+import spacy
 import tensorflow_hub as hub
 from flask import Flask
 from flask_socketio import SocketIO, emit
@@ -22,6 +21,7 @@ configs = {
     'ELASTIC_PORT': '9200',
     'ELASTIC_TIMEOUT': '300',
     'SENTENCE_EMBEDDING_MODEL': None,
+    'SPACY_MODEL': None,
     'MODEL_TYPE': 'bert',
     'MODEL_NAME_OR_PATH': 'https://storage.googleapis.com/w210-incorpbot/models/squad-1.0/',
     'ELASTIC_INDEX': 'documents',
@@ -60,9 +60,13 @@ print('Initializing intent model...')
 intent_model = intent.Model(
     sent_embedding_model, es, configs['ELASTIC_INTENT_INDEX'])
 
+# nlp utilities
+nlp = spacy.load(configs['SPACY_MODEL'])
+
 # qa model for finding best answer for a question in a context paragraph
 print('Initializing QA model...')
 qa_model = qa.Model(configs['MODEL_NAME_OR_PATH'],
+                    nlp,
                     model_type=configs['MODEL_TYPE'],
                     do_lower_case=bool(configs['DO_LOWER_CASE']),
                     max_seq_length=int(configs['MAX_SEQ_LENGTH']),
@@ -98,6 +102,7 @@ def handle_question(text):
 
     return qa_model.find_answer(text,
                                 context,
+                                full_sentence=True,
                                 n_best_size=int(configs['N_BEST_SIZE']),
                                 max_answer_length=int(configs['MAX_ANSWER_LENGTH']))
 

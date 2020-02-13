@@ -23,7 +23,7 @@ MODEL_CLASSES = {
 
 
 class Model(object):
-    def __init__(self, model_name_or_path, model_type='bert', cache_dir=None, do_lower_case=True, max_seq_length=384, doc_stride=128, max_query_length=64):
+    def __init__(self, model_name_or_path, nlp, model_type='bert', cache_dir=None, do_lower_case=True, max_seq_length=384, doc_stride=128, max_query_length=64):
         config_class, model_class, tokenizer_class = MODEL_CLASSES[model_type]
 
         self.config = config_class.from_pretrained(
@@ -50,8 +50,9 @@ class Model(object):
         self.doc_stride = doc_stride
         self.max_query_length = max_query_length
         self.do_lower_case = do_lower_case
+        self.nlp = nlp
 
-    def find_answer(self, question, context, n_best_size=20, max_answer_length=30):
+    def find_answer(self, question, context, n_best_size=20, max_answer_length=30, full_sentence=False):
         example_id = '55555'
         example = SquadExample(example_id,
                                question,
@@ -113,4 +114,12 @@ class Model(object):
             0,
         )
 
-        return predictions[example_id]
+        prediction = predictions[example_id]
+
+        if full_sentence:
+            doc = self.nlp(context)
+            for sent in doc.sents:
+                if prediction in sent.text:
+                    return sent.text
+
+        return prediction

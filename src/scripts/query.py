@@ -4,6 +4,7 @@ import argparse
 import logging
 
 import elasticsearch
+import spacy
 import tensorflow_hub as hub
 
 from ..ir import Retriever
@@ -45,8 +46,8 @@ if __name__ == '__main__':
                         ', '.join(MODEL_CLASSES.keys()),
                         )
 
-    parser.add_argument('--sent_model_name', type=str, default='bert-base-nli-stsb-mean-tokens',
-                        help='the model name to use for the sentence embeddings. See https://github.com/UKPLab/sentence-transformers#english-pre-trained-models')
+    parser.add_argument('--spacy_model', type=str, required=True,
+                        help='the spacy model to use')
 
     parser.add_argument('--model_name_or_path', type=str, default='https://storage.googleapis.com/w210-incorpbot/models/squad-1.0/',
                         help='the path to the Q&A model')
@@ -105,8 +106,11 @@ if __name__ == '__main__':
     # retriever for fetching relevant documents from elastic search
     retriever = Retriever(es, sent_embedding_model, args.index)
 
+    nlp = spacy.load(args.spacy_model)
+
     # qa model for finding best answer for a question in a context paragraph
     qa_model = Model(args.model_name_or_path,
+                     nlp,
                      model_type=args.model_type,
                      do_lower_case=args.do_lower_case,
                      max_seq_length=args.max_seq_length,
