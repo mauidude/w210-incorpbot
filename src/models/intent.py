@@ -37,6 +37,6 @@ class Model(object):
             category = document['category']
 
             if self.verbose:
-                print(f'Input: "{text}" - result {i} {score}: {category}')
+                print(f'Input: "{text}" - result {score}: {category}')
 
             return category
