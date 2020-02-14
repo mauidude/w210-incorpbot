@@ -2,11 +2,12 @@ import numpy as np
 
 
 class Model(object):
-    def __init__(self, model, elastic, index, verbose=False):
+    def __init__(self, model, elastic, index, threshold, verbose=False):
         self.model = model
         self.elastic = elastic
         self.index = index
         self.verbose = verbose
+        self.threshold = threshold
 
     def classify(self, text):
         embeddings = self.model([text])[0].numpy()
@@ -37,6 +38,15 @@ class Model(object):
             category = document['category']
 
             if self.verbose:
-                print(f'Input: "{text}" - result {score}: {category}')
+                print(f'input: "{text}" - result {score}: {category}')
+
+            # score from elasticsearch is 1 if they are close and 0 if they are not
+            # so invert it:
+            score = 1 - score
+
+            # if score is above threshold (too far from any other classes),
+            # we will assume it is a question
+            if score > self.threshold:
+                return 'question'
 
             return category

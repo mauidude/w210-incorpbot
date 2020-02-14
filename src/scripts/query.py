@@ -49,11 +49,20 @@ if __name__ == '__main__':
     parser.add_argument('--spacy_model', type=str, required=True,
                         help='the spacy model to use')
 
-    parser.add_argument('--model_name_or_path', type=str, default='https://storage.googleapis.com/w210-incorpbot/models/squad-1.0/',
+    parser.add_argument('--sentence_embedding_model', type=str, required=True,
+                        help='sentence embedding model to use')
+
+    parser.add_argument('--model_name_or_path', type=str, default='https://storage.googleapis.com/w210-incorpbot/models/squad-2.0/',
                         help='the path to the Q&A model')
 
     parser.add_argument('--cache_dir', default='', type=str,
                         help='where to store the pretrained model after downloading')
+
+    parser.add_argument('--version_2_with_negative', action='store_true',
+                        help='If true, the SQuAD examples contain some that do not have an answer.')
+
+    parser.add_argument('--null_score_diff_threshold', type=float, default=0.0,
+                        help="If null_score - best_non_null is greater than the threshold predict null.")
 
     parser.add_argument(
         "--max_seq_length",
@@ -101,7 +110,7 @@ if __name__ == '__main__':
     nodes = [f'{args.host}:{args.port}']
     es = elasticsearch.Elasticsearch(nodes, timeout=args.timeout)
 
-    sent_embedding_model = hub.load(configs['SENTENCE_EMBEDDING_MODEL'])
+    sent_embedding_model = hub.load(args.sentence_embedding_model)
 
     # retriever for fetching relevant documents from elastic search
     retriever = Retriever(es, sent_embedding_model, args.index)
@@ -116,6 +125,8 @@ if __name__ == '__main__':
                      max_seq_length=args.max_seq_length,
                      doc_stride=args.doc_stride,
                      max_query_length=args.max_query_length,
+                     null_score_diff_threshold=args.null_score_diff_threshold,
+                     version_2_with_negative=args.version_2_with_negative,
                      )
 
     cli(retriever, qa_model, args)

@@ -12,6 +12,9 @@ from flask_socketio import SocketIO, emit
 from src import ir
 from src.models import intent, qa
 
+logging.basicConfig(level=logging.INFO)
+
+
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
@@ -23,7 +26,7 @@ configs = {
     'SENTENCE_EMBEDDING_MODEL': None,
     'SPACY_MODEL': None,
     'MODEL_TYPE': 'bert',
-    'MODEL_NAME_OR_PATH': 'https://storage.googleapis.com/w210-incorpbot/models/squad-1.0/',
+    'MODEL_NAME_OR_PATH': 'https://storage.googleapis.com/w210-incorpbot/models/squad-2.0/',
     'ELASTIC_INDEX': 'documents',
     'ELASTIC_INTENT_INDEX': 'classes',
     'MAX_SEQ_LENGTH': 384,
@@ -34,37 +37,40 @@ configs = {
     'N_BEST_SIZE': 20,
     'MAX_ANSWER_LENGTH': 30,
     'VERBOSE_LOGGING': True,
+    'NULL_SCORE_DIFF_THRESHOLD': 0,
+    'VERSION_2_WITH_NEGATIVE': True,
+    'INTENT_THRESHOLD': 0.4
 }
 
-print('Loading configs...')
+app.logger.info('loading configs...')
 for cfg, default in configs.items():
     val = os.environ.get(cfg, default)
     configs[cfg] = val
     if val is None:
         raise Exception(f'missing environment variable {cfg}')
 
-print('Initializing elasticsearch client...')
+app.logger.info('initializing elasticsearch client...')
 nodes = [f"{configs['ELASTIC_HOST']}:{configs['ELASTIC_PORT']}"]
 es = elasticsearch.Elasticsearch(
     nodes, timeout=int(configs['ELASTIC_TIMEOUT']))
 
-print('Loading sentence embedding model...')
+app.logger.info('loading sentence embedding model...')
 sent_embedding_model = hub.load(configs['SENTENCE_EMBEDDING_MODEL'])
 
 # retriever for fetching relevant documents from elastic search
-print('Initializing retriever...')
+app.logger.info('initializing retriever...')
 retriever = ir.Retriever(es, sent_embedding_model, configs['ELASTIC_INDEX'])
 
 # intent mdoel for classifying user's intent so we properly respond to their input
-print('Initializing intent model...')
+app.logger.info('initializing intent model...')
 intent_model = intent.Model(
-    sent_embedding_model, es, configs['ELASTIC_INTENT_INDEX'])
+    sent_embedding_model, es, configs['ELASTIC_INTENT_INDEX'], float(configs['INTENT_THRESHOLD']))
 
 # nlp utilities
 nlp = spacy.load(configs['SPACY_MODEL'])
 
 # qa model for finding best answer for a question in a context paragraph
-print('Initializing QA model...')
+app.logger.info('initializing QA model...')
 qa_model = qa.Model(configs['MODEL_NAME_OR_PATH'],
                     nlp,
                     model_type=configs['MODEL_TYPE'],
@@ -72,7 +78,13 @@ qa_model = qa.Model(configs['MODEL_NAME_OR_PATH'],
                     max_seq_length=int(configs['MAX_SEQ_LENGTH']),
                     doc_stride=int(configs['DOC_STRIDE']),
                     max_query_length=int(configs['MAX_QUERY_LENGTH']),
+                    version_2_with_negative=bool(
+                        configs['VERSION_2_WITH_NEGATIVE']),
+                    null_score_diff_threshold=float(
+                        configs['NULL_SCORE_DIFF_THRESHOLD']),
                     )
+
+app.logger.info(configs)
 
 
 def handle_greeting(text):
@@ -100,11 +112,16 @@ def handle_other(text):
 def handle_question(text):
     context = retriever.retrieve(text)
 
-    return qa_model.find_answer(text,
-                                context,
-                                full_sentence=True,
-                                n_best_size=int(configs['N_BEST_SIZE']),
-                                max_answer_length=int(configs['MAX_ANSWER_LENGTH']))
+    answer = qa_model.find_answer(text,
+                                  context,
+                                  full_sentence=True,
+                                  n_best_size=int(configs['N_BEST_SIZE']),
+                                  max_answer_length=int(configs['MAX_ANSWER_LENGTH']))
+
+    if not answer:
+        return handle_other(text)
+
+    return answer
 
 
 def handle_sendoff(text):
@@ -125,7 +142,6 @@ def handle_thanks(text):
 intent_responses = {
     'greeting': handle_greeting,
     'help': handle_help,
-    'other': handle_other,
     'question': handle_question,
     'sendoff': handle_sendoff,
     'thanks': handle_thanks

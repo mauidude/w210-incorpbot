@@ -11,8 +11,7 @@ import tensorflow_hub as hub
 
 
 def insert(es, index, model, df):
-
-    for category, examples in df.groupby('category'):
+    for category, examples in df[~df.category.isin(['question', 'other'])].groupby('category'):
         centroid = np.mean(model(examples['input']).numpy(), axis=0)
 
         payload = {
