@@ -46,14 +46,21 @@ services:
     build: .
     depends_on:
       - elastic
+      - redis
     ports:
       - 5000:5000
     environment:
       - FLASK_APP=app
       - ELASTIC_HOST=elastic
       - ELASTIC_INDEX=documents
+      - REDIS_HOST=redis
     command: >
       bash -c "MODEL_NAME_OR_PATH=$${MODEL_CACHE}/incorpbot/$${INCORPBOT_MODEL} SENTENCE_EMBEDDING_MODEL=$${MODEL_CACHE}/use flask run --host=0.0.0.0"
+
+  redis:
+    image: redis:5-alpine
+    ports:
+      - 6379:6379
 
   query:
     build: .

@@ -11,36 +11,56 @@ class Chat extends React.Component {
         super(props);
         this.state = {
             history: [],
-            pending: false
+            pending: false,
         };
 
         this.sendMessage = this.sendMessage.bind(this);
+        this.receiveWelcome = this.receiveWelcome.bind(this);
         this.receiveMessage = this.receiveMessage.bind(this);
+        this.receiveEndResponse = this.receiveEndResponse.bind(this);
         this.handleClose = this.handleClose.bind(this);
     }
 
     componentDidMount() {
         this.websocket = socketIOClient(`http://${this.props.server}`);
+        this.websocket.on('conversation:response:end', this.receiveEndResponse);
+        this.websocket.on('conversation:welcome', this.receiveWelcome);
         this.websocket.on('conversation:response', this.receiveMessage);
 
         this.setState({
             pending: true
         });
 
+        // start a new conversation
         setTimeout(() => {
             this.websocket.emit('conversation:new');
-        }, 1000);
+        }, 250);
     }
 
     sendMessage(msg) {
         this.setState({ history: [...this.state.history, { message: msg, sender: "me" }] });
         this.setState({ pending: true });
 
-        this.websocket.emit('conversation:message', { message: msg });
+        this.websocket.emit('conversation:message', { message: msg, conversation_id: this.state.conversation_id });
     }
 
     receiveMessage(data) {
-        this.setState({ history: [...this.state.history, { message: data.message, sender: "you" }], pending: false });
+        this.setState({
+            history: [...this.state.history, { message: data.message, sender: "you" }],
+        });
+    }
+
+    receiveEndResponse() {
+        this.setState({
+            pending: false
+        });
+    }
+
+    receiveWelcome(data) {
+        this.receiveMessage(data);
+        this.setState({ conversation_id: data.conversation_id });
+
+        console.log({ conversation_id: this.state.conversation_id });
     }
 
     handleClose(e) {

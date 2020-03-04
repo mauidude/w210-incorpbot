@@ -8,18 +8,26 @@ class Retriever(object):
         self.index = index
         self.verbose = verbose
 
-    def retrieve(self, text):
+    def retrieve(self, text, state=None):
         # get sentence embeddings
         embeddings = self.embedding_model([text])[0].numpy()
+        query = {}
+
+        if state:
+            query['term'] = {
+                'state': {
+                    'value': state
+                }
+            }
+        else:
+            query['match_all'] = {}
 
         query = {
             'from': 0,
             'size': self.max_records,
             'query': {
                 'script_score': {
-                    'query': {
-                        'match_all': {}
-                    },
+                    'query': query,
                     'script': {
                         'source': f"cosineSimilarity(params.query_vector, doc['universal_sentence_embeddings']) + 1.0",
                         'params': {
