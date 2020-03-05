@@ -55,6 +55,7 @@ services:
     environment:
         - REACT_APP_SERVER=https://34.83.207.249:5000
     command: "npm run-script build"
+  
   flask:
     build: .
     depends_on:
