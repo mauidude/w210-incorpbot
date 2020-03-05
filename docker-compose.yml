@@ -42,6 +42,16 @@ services:
       - REACT_APP_SERVER=localhost:5000
     command: "npm start"
 
+  build_app:
+    build: ./app
+    working_dir: /home/node/app
+    volumes:
+      - ./app/src:/home/node/app/src
+      - ./app/src/build:/home/node/app/src/build
+    environment:
+      - REACT_APP_SERVER=localhost:5000
+    command: "npm run-script build"
+
   flask:
     build: .
     depends_on:

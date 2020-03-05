@@ -11,9 +11,9 @@ from flask import Flask
 from flask_socketio import SocketIO, emit
 from redis import Redis
 
-import src.elastic
 from src import geo, ir
 from src.conversation import Manager
+from src.elastic import get_client
 from src.models import intent, qa
 
 logging.basicConfig(level=logging.INFO)
@@ -63,7 +63,7 @@ app.logger.info('initializing conversation manager...')
 conv_mgr = Manager(redis)
 
 app.logger.info('initializing elasticsearch client...')
-es = elastic.get_client(configs['ELASTIC_HOST'], configs['ELASTIC_PORT'], timeout=int(
+es = get_client(configs['ELASTIC_HOST'], configs['ELASTIC_PORT'], timeout=int(
     configs['ELASTIC_TIMEOUT']))
 
 app.logger.info('loading sentence embedding model...')
