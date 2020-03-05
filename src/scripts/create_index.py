@@ -4,7 +4,7 @@ import argparse
 import json
 import logging
 
-from ..elastic import get_client
+from src.elastic import get_client
 
 
 def create_index(es, name, cfg):

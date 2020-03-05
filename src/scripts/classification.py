@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import tensorflow_hub as hub
 
-from ..elastic import get_client
+from src.elastic import get_client
 
 
 def insert(es, index, model, df):
