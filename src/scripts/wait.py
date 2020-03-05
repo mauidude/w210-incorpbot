@@ -5,8 +5,9 @@ import json
 import logging
 import time
 
-import elasticsearch
 import numpy as np
+
+from ..elastic import get_client
 
 
 def wait(es):
@@ -32,7 +33,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    nodes = [f'{args.host}:{args.port}']
-    es = elasticsearch.Elasticsearch(nodes, timeout=args.timeout)
+    es = get_client(args.host, args.port, timeout=args.timeout)
 
     wait(es)

@@ -3,14 +3,15 @@ import os
 import time
 import uuid
 
-import numpy as np
-
 import elasticsearch
+import numpy as np
 import spacy
 import tensorflow_hub as hub
 from flask import Flask
 from flask_socketio import SocketIO, emit
 from redis import Redis
+
+import src.elastic
 from src import geo, ir
 from src.conversation import Manager
 from src.models import intent, qa
@@ -62,9 +63,8 @@ app.logger.info('initializing conversation manager...')
 conv_mgr = Manager(redis)
 
 app.logger.info('initializing elasticsearch client...')
-nodes = [f"{configs['ELASTIC_HOST']}:{configs['ELASTIC_PORT']}"]
-es = elasticsearch.Elasticsearch(
-    nodes, timeout=int(configs['ELASTIC_TIMEOUT']))
+es = elastic.get_client(configs['ELASTIC_HOST'], configs['ELASTIC_PORT'], timeout=int(
+    configs['ELASTIC_TIMEOUT']))
 
 app.logger.info('loading sentence embedding model...')
 sent_embedding_model = hub.load(configs['SENTENCE_EMBEDDING_MODEL'])
@@ -101,6 +101,7 @@ geo_resolver = geo.Resolver(nlp)
 
 app.logger.info(configs)
 
+
 def supported_states():
     states = list(geo.states.values())
     states.sort()
@@ -129,7 +130,8 @@ def handle_help(cid, text):
         "I'm here to help you with your legal questions! Ask away!"
     ])]
 
-    response.append(f'I can answer questions about the following states: {supported_states()}')
+    response.append(
+        f'I can answer questions about the following states: {supported_states()}')
 
     return response
 

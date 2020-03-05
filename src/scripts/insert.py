@@ -4,10 +4,10 @@ import argparse
 import json
 import logging
 
-import elasticsearch
 import spacy
 import tensorflow_hub as hub
 
+from ..elastic import get_client
 from ..models.embedding import Model
 
 
@@ -67,7 +67,6 @@ if __name__ == '__main__':
     model = Model(hub.load(args.model))
     nlp = spacy.load(args.spacy_model)
 
-    nodes = [f'{args.host}:{args.port}']
-    es = elasticsearch.Elasticsearch(nodes, timeout=args.timeout)
+    es = get_client(args.host, args.port, timeout=args.timeout)
 
     insert(es, args.index,  model, nlp, index_cfg)

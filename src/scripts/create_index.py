@@ -4,7 +4,7 @@ import argparse
 import json
 import logging
 
-import elasticsearch
+from ..elastic import get_client
 
 
 def create_index(es, name, cfg):
@@ -37,8 +37,5 @@ if __name__ == '__main__':
 
     with open(args.file) as f:
         index_cfg = json.load(f)
-
-    nodes = [f'{args.host}:{args.port}']
-
-    es = elasticsearch.Elasticsearch(nodes, timeout=args.timeout)
+    es = get_client(args.host, args.port, timeout=args.timeout)
     create_index(es, args.name,  index_cfg)

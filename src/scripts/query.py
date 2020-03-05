@@ -7,6 +7,7 @@ import elasticsearch
 import spacy
 import tensorflow_hub as hub
 
+from ..elastic import get_client
 from ..ir import Retriever
 from ..models.qa import MODEL_CLASSES, Model
 
@@ -107,8 +108,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    nodes = [f'{args.host}:{args.port}']
-    es = elasticsearch.Elasticsearch(nodes, timeout=args.timeout)
+    es = get_client(args.host, args.port, timeout=args.timeout)
 
     sent_embedding_model = hub.load(args.sentence_embedding_model)
 
