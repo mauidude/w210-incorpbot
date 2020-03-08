@@ -27,7 +27,7 @@ services:
         python3 -m src.scripts.wait --host=elastic &&
         python3 -m src.scripts.create_index --host=elastic --name=documents --file=data/elasticsearch/documents.json &&
         python3 -m src.scripts.create_index --host=elastic --name=classes --file=data/elasticsearch/classes.json &&
-        python3 -m src.scripts.insert --host=elastic --index=documents --file=data/ca.json --model=$${MODEL_CACHE}/use --spacy_model=$${SPACY_MODEL} &&
+        python3 -m src.scripts.insert --host=elastic --index=documents --file=data/*.json --model=$${MODEL_CACHE}/use --spacy_model=$${SPACY_MODEL} &&
         python3 -m src.scripts.classification --host=elastic --index=classes --file=data/dialog.csv --model=$${MODEL_CACHE}/use
       "
 

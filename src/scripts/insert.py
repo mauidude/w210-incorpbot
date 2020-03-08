@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import glob
 import json
 import logging
 
@@ -61,12 +62,14 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    with open(args.file) as f:
-        index_cfg = json.load(f)
-
     model = Model(hub.load(args.model))
     nlp = spacy.load(args.spacy_model)
 
     es = get_client(args.host, args.port, timeout=args.timeout)
 
-    insert(es, args.index,  model, nlp, index_cfg)
+    for filename in glob.glob(args.file):
+        logging.info(f'importing {filename}')
+
+        with open(filename) as f:
+            index_cfg = json.load(f)
+            insert(es, args.index,  model, nlp, index_cfg)

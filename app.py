@@ -16,7 +16,7 @@ from src.conversation import Manager
 from src.elastic import get_client
 from src.models import intent, qa
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 
 app = Flask(__name__)

@@ -14,10 +14,23 @@ class Retriever(object):
         query = {}
 
         if state:
-            query['term'] = {
-                'state': {
-                    'value': state
-                }
+            query['bool'] = {
+                'should': [
+                    {
+                        'term': {
+                            'state': {
+                                'value': state
+                            }
+                        }
+                    },
+                    {
+                        'term': {
+                            'state': {
+                                'value': 'Federal'
+                            }
+                        }
+                    }
+                ]
             }
         else:
             query['match_all'] = {}

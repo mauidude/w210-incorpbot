@@ -1,6 +1,10 @@
 # mapping from canonical name to elastic search name
 states = {
-    'california': 'California'
+    'california': 'California',
+    'nevada': 'Nevada',
+    'delaware': 'Delaware',
+    'new york': 'New York',
+    'texas': 'Texas'
 }
 
 
