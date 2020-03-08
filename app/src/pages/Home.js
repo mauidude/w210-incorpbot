@@ -47,11 +47,11 @@ class Home extends React.Component {
                     <Row>
                         <Col>
                             <h2>Services</h2>
-                            <p>Our bot covers incorporation and patents for multiple US states. Begin chatting now to discover what else it can do!</p>
+                            <p>Incorpbot covers incorporation and patents for multiple US states. See below for the full list. Begin chatting now to discover what else it can do!</p>
                         </Col>
                         <Col>
                             <h2>Why Us</h2>
-                            <p>Save time and money by asking your preliminary legal questions here before visiting a lawyer. Reduce your billable hours and become your own legal expert here!</p>
+                            <p>Save time and money by asking your preliminary legal questions here before visiting a lawyer. Reduce your billable hours and become your own legal expert with Incorpbot!</p>
                         </Col>
                         <Col>
                             <h2>Our Data</h2>
