@@ -56,15 +56,13 @@ services:
   flask:
     build: .
     depends_on:
-      #- elastic
+      - elastic
       - redis
     ports:
       - 5000:5000
     environment:
       - FLASK_APP=app
-        #- ELASTIC_HOST=elastic
-      - "ELASTIC_HOST=4hd6x88iwx:gxfl8vja5z@incorpbot-1666119064.us-west-2.bonsaisearch.net"
-      - "ELASTIC_PORT=443"
+      - ELASTIC_HOST=elastic
       - ELASTIC_INDEX=documents
       - REDIS_HOST=redis
     command: >
