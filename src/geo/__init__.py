@@ -1,4 +1,6 @@
 # mapping from canonical name to elastic search name
+import random
+
 states = {
     'california': 'California',
     'nevada': 'Nevada',
@@ -6,6 +8,21 @@ states = {
     'new york': 'New York',
     'texas': 'Texas'
 }
+
+emoji_by_state = {
+    'California': '☀️🌁',
+    'Nevada': '🎰🎲🃏',
+    'New York': '🗽🏙',
+    'Texas': '🤠🐄'
+}
+
+
+def emoji(state):
+    emojis = emoji_by_state.get(state, None)
+    if not emojis:
+        return None
+
+    return random.choice(emojis)
 
 
 def lookup(state):

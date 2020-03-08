@@ -150,9 +150,15 @@ def handle_unsupported_state(state):
 
 
 def handle_state_smalltalk(state):
+    emoji = geo.emoji(state)
+    if emoji:
+        emoji = f' {emoji}'
+    else:
+        emoji = ''
+
     text = np.random.choice([
-        f'I have never been to {state} but hope to one day! Now, let me find your answer... 🔍👀',
-        f'I hear {state} is beautiful this time of year! One second, while I check on that...'
+        f'I have never been to {state}{emoji} but hope to one day! Now, let me find your answer... 🔍👀',
+        f'I hear {state}{emoji} is beautiful this time of year! One second, while I check on that...🤔'
     ])
 
     emit('conversation:response', {'message': text})
