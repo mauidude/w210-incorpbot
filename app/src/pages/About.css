@@ -1,0 +1,7 @@
+.gallery {
+    margin-bottom: 50px;
+}
+
+.gallery img {
+    box-shadow: 2px 2px 5px rgba(128, 128, 128, 0.4);
+}

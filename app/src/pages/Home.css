@@ -1,0 +1,45 @@
+.jumbotron {
+    overflow: hidden;
+    position: relative;
+    box-shadow: 5px 0 5px rgba(0,0,0,.2);
+    border-bottom: 1px solid #ccc;
+}
+
+.jumbotron:before {
+    content: ' ';
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    opacity: 0.2;
+    background: url('/images/herobg.jpg') no-repeat;
+    background-size: cover;
+    -ms-background-size: cover;
+    -o-background-size: cover;
+    -moz-background-size: cover;
+    -webkit-background-size: cover;
+    background-size: cover;
+}
+
+.jumbotron .container {
+    opacity: 1.0;
+    z-index: 2;
+    position: relative;
+}
+
+.flag {
+    box-shadow: 2px 2px 5px rgba(128, 128, 128, 0.4);
+}
+
+.label {
+    text-align: center;
+    display: block;
+}
+
+.flag.new-york {
+    margin-top: 16.5px;
+    margin-bottom: 16.6px;
+}
