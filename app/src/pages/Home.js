@@ -55,7 +55,7 @@ class Home extends React.Component {
                         </Col>
                         <Col>
                             <h2>Our Data</h2>
-                            <p>We pull data from many sources and compile them to give you the best expierience and cover as many states as we can. Check back often to see if your state is supported!</p>
+                            <p>We pull data from many official sources, compile them, and feed them to our machine learning algorithm to give you the answers you need. Check back often to see if your state is supported!</p>
                         </Col>
                     </Row>
                 </Container>
