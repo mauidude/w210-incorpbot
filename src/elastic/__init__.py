@@ -3,7 +3,7 @@ import elasticsearch
 
 def get_client(host, port, timeout=300):
     port = int(port)
-    scheme = 'https' if port == 443 else None
+    scheme = 'https' if port == 443 else 'http'
     auth = None
 
     if '@' in host:

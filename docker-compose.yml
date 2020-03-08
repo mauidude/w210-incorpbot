@@ -18,20 +18,17 @@ services:
 
   setup:
     build: .
-    #depends_on:
-    #- elastic
-    environment:
-      - "ELASTIC_HOST=4hd6x88iwx:gxfl8vja5z@incorpbot-1666119064.us-west-2.bonsaisearch.net"
-      - "ELASTIC_PORT=443"
+    depends_on:
+    - elastic
     command: >
-      bash -c "set -x;
-        curl -X DELETE \"https://$${ELASTIC_HOST}:$${ELASTIC_PORT}/documents\" && \
-        curl -X DELETE \"https://$${ELASTIC_HOST}:$${ELASTIC_PORT}/classes\"  && \
-        python3 -m src.scripts.wait --host=$${ELASTIC_HOST} --port=$${ELASTIC_PORT} &&
-        python3 -m src.scripts.create_index --host=$${ELASTIC_HOST} --port=$${ELASTIC_PORT} --name=documents --file=data/elasticsearch/documents.json &&
-        python3 -m src.scripts.create_index --host=$${ELASTIC_HOST} --port=$${ELASTIC_PORT} --name=classes --file=data/elasticsearch/classes.json &&
-        python3 -m src.scripts.insert --host=$${ELASTIC_HOST} --port=$${ELASTIC_PORT} --index=documents --file=data/ca.json --model=$${MODEL_CACHE}/use --spacy_model=$${SPACY_MODEL} &&
-        python3 -m src.scripts.classification --host=$${ELASTIC_HOST} --port=$${ELASTIC_PORT}  --index=classes --file=data/dialog.csv --model=$${MODEL_CACHE}/use
+      bash -c "
+        curl -X DELETE http://elastic:9200/documents && \
+        curl -X DELETE http://elastic:9200/classes && \
+        python3 -m src.scripts.wait --host=elastic &&
+        python3 -m src.scripts.create_index --host=elastic --name=documents --file=data/elasticsearch/documents.json &&
+        python3 -m src.scripts.create_index --host=elastic --name=classes --file=data/elasticsearch/classes.json &&
+        python3 -m src.scripts.insert --host=elastic --index=documents --file=data/*.json --model=$${MODEL_CACHE}/use --spacy_model=$${SPACY_MODEL} &&
+        python3 -m src.scripts.classification --host=elastic --index=classes --file=data/dialog.csv --model=$${MODEL_CACHE}/use
       "
 
   app:
