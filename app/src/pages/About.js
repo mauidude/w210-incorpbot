@@ -13,16 +13,16 @@ class About extends React.Component {
                 <h2>The Team</h2>
                 <Row className="gallery">
                     <Col>
+                        <Image alt="Ivan Fan" src="/images/team/anonm.jpg" roundedCircle fluid />
+                        <span class="label">Ivan Fan</span>
+                    </Col>
+                    <Col>
                         <Image alt="Shane Andrade" src="/images/team/shane.jpg" roundedCircle fluid />
                         <span class="label">Shane Andrade</span>
                     </Col>
                     <Col>
                         <Image alt="Maria Corina Cabezas " src="/images/team/anonf.jpg" roundedCircle fluid />
                         <span class="label">Maria Corina Cabezas</span>
-                    </Col>
-                    <Col>
-                        <Image alt="Ivan Fan" src="/images/team/anonm.jpg" roundedCircle fluid />
-                        <span class="label">Ivan Fan</span>
                     </Col>
                     <Col>
                         <Image alt="Yuchen Zhang" src="/images/team/anonf.jpg" roundedCircle fluid />
