@@ -23,8 +23,8 @@ steps:
     command:
       - >
         if [[ $(buildkite-agent meta-data get "PUSH") == "yes" ]]; then
-            ./bin/push incorpbot
-            ./bin/push app
+            ./bin/push.sh incorpbot
+            ./bin/push.sh app
         fi
 
   - wait
@@ -43,6 +43,6 @@ steps:
     command:
       - >
         if [[ $(buildkite-agent meta-data get "DEPLOY") == "yes" ]]; then
-            ./bin/deploy incorpbot
-            ./bin/deploy app
+            ./bin/deploy.sh incorpbot
+            ./bin/deploy.sh app
         fi
