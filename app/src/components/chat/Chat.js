@@ -1,6 +1,8 @@
+import moment from 'moment';
 import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Nav from 'react-bootstrap/Nav';
+import ReactGA from 'react-ga';
 import socketIOClient from "socket.io-client";
 import './Chat.css';
 import History from './History';
@@ -58,7 +60,17 @@ class Chat extends React.Component {
 
     receiveWelcome(data) {
         this.receiveMessage(data);
-        this.setState({ conversation_id: data.conversation_id });
+        this.setState({ conversation_id: data.conversation_id, start: moment() });
+
+        ReactGA.set({
+            conversation_id: this.state.conversation_id
+        });
+
+
+        ReactGA.event({
+            category: 'User',
+            action: 'Started chat'
+        });
 
         console.log({ conversation_id: this.state.conversation_id });
     }
@@ -66,6 +78,18 @@ class Chat extends React.Component {
     handleClose(e) {
         e.preventDefault();
         this.props.onClose();
+
+        ReactGA.event({
+            category: 'User',
+            action: 'Ended chat'
+        });
+
+        var duration = moment.duration(moment().diff(this.state.start));
+        ReactGA.timing({
+            category: 'Chat',
+            variable: 'duration',
+            value: duration.as('seconds')
+        });
     }
 
     render() {

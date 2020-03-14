@@ -41,6 +41,8 @@ services:
       - 80:3000
     environment:
       - REACT_APP_SERVER=localhost:5000
+      - REACT_APP_GA=UA-00000000-1
+      - REACT_APP_DEBUG_GA=true
     command: "npm start"
 
   build_app:
@@ -49,8 +51,6 @@ services:
     volumes:
       - ./app/src:/home/node/app/src
       - ./app/build:/home/node/app/build
-    environment:
-      - REACT_APP_SERVER=https://34.83.207.249:5000
     command: "npm run-script build"
 
   flask:

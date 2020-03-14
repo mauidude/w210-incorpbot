@@ -14,19 +14,19 @@ class About extends React.Component {
                 <Row className="gallery">
                     <Col>
                         <Image alt="Ivan Fan" src="/images/team/anonm.jpg" roundedCircle fluid />
-                        <span class="label">Ivan Fan</span>
+                        <span className="label">Ivan Fan</span>
                     </Col>
                     <Col>
                         <Image alt="Shane Andrade" src="/images/team/shane.jpg" roundedCircle fluid />
-                        <span class="label">Shane Andrade</span>
+                        <span className="label">Shane Andrade</span>
                     </Col>
                     <Col>
                         <Image alt="Maria Corina Cabezas " src="/images/team/anonf.jpg" roundedCircle fluid />
-                        <span class="label">Maria Corina Cabezas</span>
+                        <span className="label">Maria Corina Cabezas</span>
                     </Col>
                     <Col>
                         <Image alt="Yuchen Zhang" src="/images/team/anonf.jpg" roundedCircle fluid />
-                        <span class="label">Yuchen Zhang</span>
+                        <span className="label">Yuchen Zhang</span>
                     </Col>
                 </Row>
 

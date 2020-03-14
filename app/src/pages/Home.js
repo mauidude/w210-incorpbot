@@ -65,23 +65,23 @@ class Home extends React.Component {
                     <Row>
                         <Col>
                             <Image className="flag california" alt="California" src="/images/flags/california_flag.png" fluid />
-                            <span class="label">California</span>
+                            <span className="label">California</span>
                         </Col>
                         <Col>
                             <Image className="flag delaware" alt="Delaware" src="/images/flags/delaware_flag.png" fluid />
-                            <span class="label">Delaware</span>
+                            <span className="label">Delaware</span>
                         </Col>
                         <Col>
                             <Image className="flag nevada" alt="Nevada" src="/images/flags/nevada_flag.png" fluid />
-                            <span class="label">Nevada</span>
+                            <span className="label">Nevada</span>
                         </Col>
                         <Col>
                             <Image className="flag new-york" alt="New York" src="/images/flags/new_york_flag.png" fluid />
-                            <span class="label">New York</span>
+                            <span className="label">New York</span>
                         </Col>
                         <Col>
                             <Image className="flag texas" alt="Texas" src="/images/flags/texas_flag.png" fluid />
-                            <span class="label">Texas</span>
+                            <span className="label">Texas</span>
                         </Col>
                     </Row>
                 </Container>
