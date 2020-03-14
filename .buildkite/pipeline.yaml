@@ -1,0 +1,46 @@
+steps:
+  - label: build incorpbot
+    command: bin/build.sh incorpbot .
+
+  - label: build app
+    command: bin/build.sh app app/
+
+  - wait
+
+  - block: push?
+    fields:
+      - select: push docker images?
+        key: PUSH
+        options:
+          - label: "Yes"
+            value: "yes"
+          - label: "No"
+            value: "no"
+
+  - label: check push
+    command:
+      - >
+        if [[ $(buildkite-agent meta-data get "PUSH") == "yes" ]]; then
+            ./bin/push incorpbot
+            ./bin/push app
+        fi
+
+  - wait
+
+  - block: deploy?
+    fields:
+      - select: Deploy new images?
+        key: DEPLOY
+        options:
+          - label: "Yes"
+            value: "yes"
+          - label: "No"
+            value: "no"
+
+  - label: check deploy
+    command:
+      - >
+        if [[ $(buildkite-agent meta-data get "DEPLOY") == "yes" ]]; then
+            ./bin/deploy incorpbot
+            ./bin/deploy app
+        fi
