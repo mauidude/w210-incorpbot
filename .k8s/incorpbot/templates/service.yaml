@@ -1,0 +1,18 @@
+{{- $name := include "incorpbot.fullname" . -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  labels:
+    {{- include "incorpbot.labels" . | nindent 4 }}
+  annotations:
+    beta.cloud.google.com/backend-config: '{{ printf "{\"ports\":{\"%.f\":\"%s\"} }" .Values.service.port $name }}'
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "incorpbot.selectorLabels" . | nindent 4 }}
