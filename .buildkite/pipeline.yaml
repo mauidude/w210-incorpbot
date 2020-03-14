@@ -1,9 +1,11 @@
 steps:
   - label: build incorpbot
-    command: bin/build.sh incorpbot .
+    command:
+      - "./bin/build.sh incorpbot ."
 
   - label: build app
-    command: bin/build.sh app app/
+    command:
+      - "./bin/build.sh app app/"
 
   - wait
 
