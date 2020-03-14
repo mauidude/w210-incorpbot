@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -ex
 
 tag=us.gcr.io/w210-incorpbot/$1
 
