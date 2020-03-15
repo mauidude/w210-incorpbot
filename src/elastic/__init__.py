@@ -8,7 +8,7 @@ def get_client(host, port, timeout=300, username=None, password=None):
     scheme = 'https' if port == 443 else 'http'
     auth = None
 
-    if re.match(r'^https?://'):
+    if re.match(r'^https?://', host):
         index = host.index('://')
         scheme = host[0:index]
         host = host[index+3:]
