@@ -44,7 +44,7 @@ resources:
     memory: 8G
 
 elastic:
-  host: elastic-es-default
+  host: https://elastic-es-default
   password:
     valueFrom:
       secretKeyRef:
