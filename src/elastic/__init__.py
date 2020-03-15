@@ -1,6 +1,6 @@
 import re
 
-import elasticsearch
+from elasticsearch import Elasticsearch, RequestsHttpConnection
 
 
 def get_client(host, port, timeout=300, username=None, password=None):
@@ -20,4 +20,4 @@ def get_client(host, port, timeout=300, username=None, password=None):
     elif username is not None or password is not None:
         auth = (username, password)
 
-    return elasticsearch.Elasticsearch([host], http_auth=auth, scheme=scheme, port=port)
+    return Elasticsearch([host], http_auth=auth, scheme=scheme, port=port, verify_certs=False, connection_class=RequestsHttpConnection)
