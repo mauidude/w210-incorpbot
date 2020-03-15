@@ -1,3 +1,5 @@
+import re
+
 import elasticsearch
 
 
@@ -5,6 +7,11 @@ def get_client(host, port, timeout=300, username=None, password=None):
     port = int(port)
     scheme = 'https' if port == 443 else 'http'
     auth = None
+
+    if re.match(r'^https?://'):
+        index = host.index('://')
+        scheme = host[0:index]
+        host = host[index+3:]
 
     if '@' in host and username is None and password is None:
         auth, host = host.split('@')
