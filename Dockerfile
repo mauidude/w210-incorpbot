@@ -1,6 +1,6 @@
 FROM python:3.7-slim
 
-RUN apt-get update && apt-get install -y curl unzip
+RUN apt-get update && apt-get install -y curl unzip gcc
 
 RUN pip3 install --no-cache-dir torch==1.4.0 tensorflow==2.1.0 spacy==2.2.3
 
