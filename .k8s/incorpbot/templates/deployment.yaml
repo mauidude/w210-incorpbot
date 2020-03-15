@@ -47,7 +47,7 @@ spec:
             - name: FLASK_APP
               value: app
             - name: ELASTIC_HOST
-              value: elastic
+              value: {{ .Values.elastic.host }}
             - name: ELASTIC_PORT
               value: "9200"
             - name: ELASTIC_INDEX
@@ -59,7 +59,7 @@ spec:
             - name: ELASTIC_USER
               value: elastic
             - name: ELASTIC_PASSWORD
-              {{- toYaml .Values.password | nindent 14 }}
+              {{- toYaml .Values.elastic.password | nindent 14 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
