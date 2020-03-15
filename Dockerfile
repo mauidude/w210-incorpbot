@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.7-alpine
 
 RUN pip3 install --no-cache-dir torch==1.4.0 tensorflow==2.1.0 spacy==2.2.3
 
