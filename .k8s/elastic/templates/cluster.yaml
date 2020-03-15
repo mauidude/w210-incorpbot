@@ -1,0 +1,29 @@
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: {{ include "elastic.fullname" . }}
+spec:
+  version: {{ .Chart.AppVersion }}
+  nodeSets:
+    - name: {{ .Values.nodeSet.name }}
+      count: {{ .Values.replicaCount }}
+      config:
+        node.master: {{ .Values.nodeSet.master }}
+        node.data: {{ .Values.nodeSet.data }}
+        node.ingest: {{ .Values.nodeSet.ingest }}
+        node.store.allow_mmap: {{ .Values.nodeSet.allow_mmap }}
+      volumeClaimTemplates:
+      - metadata:
+          name: elasticsearch-data
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: {{ .Values.nodeSet.storage }}
+            storageClassName: standard
+  http:
+    service:
+      spec:
+        # expose this cluster Service with a LoadBalancer
+        type: ClusterIP

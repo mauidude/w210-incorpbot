@@ -25,6 +25,8 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 
 configs = {
     'ELASTIC_HOST': None,
+    'ELASTIC_USER': '',
+    'ELASTIC_PASSWORD': '',
     'ELASTIC_PORT': '9200',
     'ELASTIC_TIMEOUT': '300',
     'SENTENCE_EMBEDDING_MODEL': None,
@@ -55,6 +57,11 @@ for cfg, default in configs.items():
     if val is None:
         raise Exception(f'missing environment variable {cfg}')
 
+if configs['ELASTIC_USER'] == '':
+    configs['ELASTIC_USER'] = None
+if configs['ELASTIC_PASSWORD'] == '':
+    configs['ELASTIC_PASSWORD'] = None
+
 app.logger.info('initializing redis client...')
 redis = Redis(host=configs['REDIS_HOST'],
               port=int(configs['REDIS_PORT']), db=0)
@@ -63,8 +70,10 @@ app.logger.info('initializing conversation manager...')
 conv_mgr = Manager(redis)
 
 app.logger.info('initializing elasticsearch client...')
-es = get_client(configs['ELASTIC_HOST'], configs['ELASTIC_PORT'], timeout=int(
-    configs['ELASTIC_TIMEOUT']))
+es = get_client(configs['ELASTIC_HOST'], configs['ELASTIC_PORT'],
+                timeout=int(configs['ELASTIC_TIMEOUT']),
+                username=configs['ELASTIC_USER'],
+                password=configs['ELASTIC_PASSWORD'])
 
 app.logger.info('loading sentence embedding model...')
 sent_embedding_model = hub.load(configs['SENTENCE_EMBEDDING_MODEL'])

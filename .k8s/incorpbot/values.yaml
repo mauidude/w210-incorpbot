@@ -43,6 +43,12 @@ resources:
     cpu: 1
     memory: 8G
 
+password:
+  valueFrom:
+    secretKeyRef:
+      name: elastic-es-elastic-user
+      key: elastic
+
 nodeSelector: {}
 
 tolerations: []
