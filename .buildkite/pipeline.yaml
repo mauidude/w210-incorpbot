@@ -1,4 +1,10 @@
 steps:
+  - label: validate json
+    command:
+      - "./bin/validate_json.py"
+
+  - wait
+
   - label: build incorpbot
     command:
       - "./bin/build.sh incorpbot ."
