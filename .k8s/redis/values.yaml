@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: us.gcr.io/w210-incorpbot/redis:5-alpine
+  repository: redis:5-alpine
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []

@@ -39,9 +39,11 @@ resources:
   limits:
     cpu: 2
     memory: 10G
+    nvidia.com/gpu: 1
   requests:
     cpu: 1
     memory: 8G
+
 
 elastic:
   host: https://elastic-es-default
@@ -51,11 +53,16 @@ elastic:
         name: elastic-es-elastic-user
         key: elastic
 
-nodeSelector: {}
-
-tolerations: []
-
 affinity: {}
 
 backend:
   timeoutSec: 300
+
+
+# if using GPUs (aws):
+nodeSelector:
+  nvidia.com/gpu: "true"
+tolerations:
+- key: "nvidia.com/gpu"
+  operator: "Exists"
+  effect: "NoSchedule"

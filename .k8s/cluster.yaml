@@ -1,0 +1,110 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: incorpbot
+  region: us-west-2
+
+availabilityZones: ["us-west-2a", "us-west-2b", "us-west-2c"]
+
+nodeGroups:
+  - name: cpu
+    ami: auto
+    instanceType: mixed
+    volumeSize: 50
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 4
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      withAddonPolicies:
+        autoScaler: true
+        ebs: true
+        albIngress: true
+        cloudWatch: true
+    instancesDistribution:
+      instanceTypes:
+        - r5.large
+        - r5.xlarge
+        - c5.2xlarge
+        - c5.4xlarge
+        - t2.xlarge
+        - t3.2xlarge
+        - m5.xlarge
+        - m5.2xlarge
+      maxPrice: 0.20
+    tags:
+      k8s.io/cluster-autoscaler/enabled: "true"
+    labels:
+      lifecycle: Ec2Spot
+    availabilityZones: ["us-west-2a", "us-west-2b", "us-west-2c"]
+
+  - name: gpu-a
+    ami: auto
+    instanceType: mixed
+    desiredCapacity: 1
+    volumeSize: 50
+    instancesDistribution:
+      instanceTypes:
+        - p2.xlarge
+        - p3.2xlarge
+      spotInstancePools: 5
+    tags:
+      k8s.io/cluster-autoscaler/node-template/taint/dedicated: nvidia.com/gpu=true
+      k8s.io/cluster-autoscaler/node-template/label/nvidia.com/gpu: "true"
+      k8s.io/cluster-autoscaler/enabled: "true"
+    labels:
+      lifecycle: Ec2Spot
+      nvidia.com/gpu: "true"
+      k8s.amazonaws.com/accelerator: nvidia-tesla
+    taints:
+      nvidia.com/gpu: "true:NoSchedule"
+    availabilityZones: ["us-west-2a"]
+
+  - name: gpu-b
+    ami: auto
+    instanceType: mixed
+    desiredCapacity: 0
+    volumeSize: 50
+    instancesDistribution:
+      instanceTypes:
+        - p2.xlarge
+        - p3.2xlarge
+      spotInstancePools: 5
+    tags:
+      k8s.io/cluster-autoscaler/node-template/taint/dedicated: nvidia.com/gpu=true
+      k8s.io/cluster-autoscaler/node-template/label/nvidia.com/gpu: "true"
+      k8s.io/cluster-autoscaler/enabled: "true"
+    labels:
+      lifecycle: Ec2Spot
+      nvidia.com/gpu: "true"
+      k8s.amazonaws.com/accelerator: nvidia-tesla
+    taints:
+      nvidia.com/gpu: "true:NoSchedule"
+    availabilityZones: ["us-west-2b"]
+
+  - name: gpu-c
+    ami: auto
+    instanceType: mixed
+    desiredCapacity: 0
+    volumeSize: 50
+    instancesDistribution:
+      instanceTypes:
+        - p2.xlarge
+        - p3.2xlarge
+      spotInstancePools: 5
+    tags:
+      k8s.io/cluster-autoscaler/node-template/taint/dedicated: nvidia.com/gpu=true
+      k8s.io/cluster-autoscaler/node-template/label/nvidia.com/gpu: "true"
+      k8s.io/cluster-autoscaler/enabled: "true"
+    labels:
+      lifecycle: Ec2Spot
+      nvidia.com/gpu: "true"
+      k8s.amazonaws.com/accelerator: nvidia-tesla
+    taints:
+      nvidia.com/gpu: "true:NoSchedule"
+    availabilityZones: ["us-west-2c"]
