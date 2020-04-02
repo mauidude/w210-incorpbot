@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: us.gcr.io/w210-incorpbot/incorpbot
+  repository: 930446191589.dkr.ecr.us-west-2.amazonaws.com/w210-incorpbot/incorpbot
 
 imagePullSecrets: []
 nameOverride: ""
