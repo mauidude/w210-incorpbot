@@ -127,15 +127,15 @@ def supported_states():
 
 def handle_greeting(cid, text):
     return np.random.choice([
-        'Hello! 👋',
-        'Howdy! Welcome to Incorpbot! 😄',
+        'Hello!',
+        'Howdy! Welcome to Incorpbot!',
         'Welcome! What can I help you with?'
     ])
 
 
 def handle_help(cid, text):
     response = [np.random.choice([
-        'Ask me a question about your legal needs! 💁',
+        'Ask me a question about your legal needs!',
         "I'm here to help you with your legal questions! Ask away!"
     ])]
 
@@ -147,27 +147,21 @@ def handle_help(cid, text):
 
 def handle_other(cid, text):
     return np.random.choice([
-        "Hmmm... I don't think I can help you with that. 😓",
-        'I am not sure I understand. 😕'
+        "Hmmm... I don't think I can help you with that.",
+        'I am not sure I understand.'
     ])
 
 
 def handle_unsupported_state(state):
     return np.random.choice([
-        f'Unfortunately, I cannot answer questions about {state} right now 🙊. I currently only have information on {supported_states()}.'
+        f'Unfortunately, I cannot answer questions about {state} right now. I currently only have information on {supported_states()}.'
     ])
 
 
 def handle_state_smalltalk(state):
-    emoji = geo.emoji(state)
-    if emoji:
-        emoji = f' {emoji}'
-    else:
-        emoji = ''
-
     text = np.random.choice([
-        f'I have never been to {state}{emoji} but hope to one day! Now, let me find your answer... 🔍👀',
-        f'I hear {state}{emoji} is beautiful this time of year! One second, while I check on that...🤔'
+        f'I have never been to {state} but hope to one day! Now, let me find your answer...',
+        f'I hear {state} is beautiful this time of year! One second, while I check on that...'
     ])
 
     emit('conversation:response', {'message': text})
@@ -205,8 +199,8 @@ def handle_question(cid, text):
             conv_mgr.update(cid, {'pending_question': text})
 
             return np.random.choice([
-                'In order to best answer your question, can you please let me know which state you are in? 🇺🇸',
-                'I would be happy to help you but first can you please tell me which state you are in? 🇺🇸'
+                'In order to best answer your question, can you please let me know which state you are in? ',
+                'I would be happy to help you but first can you please tell me which state you are in? '
             ])
 
     else:
@@ -241,8 +235,8 @@ def handle_sendoff(cid, text):
 
 def handle_thanks(cid, text):
     return np.random.choice([
-        'Glad to be of service! 🙌',
-        'Thank you for letting me help! 👍'
+        'Glad to be of service!',
+        'Thank you for letting me help!'
     ])
 
 
@@ -258,7 +252,7 @@ intent_responses = {
 @socketio.on('conversation:new')
 def conversation_new():
     emit('conversation:welcome', {
-         'message': 'Welcome to Incorpbot 🤖! Begin by asking me a question.',
+         'message': 'Welcome to Incorpbot! Begin by asking me a question.',
          'conversation_id': str(uuid.uuid4()),
          })
 

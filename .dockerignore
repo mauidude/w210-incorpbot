@@ -8,3 +8,5 @@ data/models
 .DS_Store
 app/
 .ipynb_checkpoints
+.git-credentials
+buildkite-agent-config.json

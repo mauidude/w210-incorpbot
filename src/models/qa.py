@@ -51,6 +51,10 @@ class Model(object):
 
         self.device = torch.device(
             "cuda" if torch.cuda.is_available() else "cpu")
+
+        logger.info('QA model using device: {self.device}')
+        self.model.to(self.device)
+
         self.max_seq_length = max_seq_length
         self.doc_stride = doc_stride
         self.max_query_length = max_query_length

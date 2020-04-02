@@ -4,8 +4,10 @@
 
 replicaCount: 2
 
+version: latest
+
 image:
-  repository: us.gcr.io/w210-incorpbot/app
+  repository: 930446191589.dkr.ecr.us-west-2.amazonaws.com/w210-incorpbot/app
 
 imagePullSecrets: []
 nameOverride: ""

@@ -1,8 +1,7 @@
-FROM python:3.7-slim
+FROM pytorch/pytorch
 
 RUN apt-get update && apt-get install -y curl unzip gcc g++
-
-RUN pip3 install --no-cache-dir torch==1.4.0 tensorflow==2.1.0 spacy==2.2.3
+RUN pip install --no-cache-dir tensorflow==2.1.0 spacy==2.2.3
 
 ENV MODEL_CACHE=/root/.cache/torch
 
@@ -13,7 +12,7 @@ RUN curl -o ${USE_MODEL}.tar.gz https://storage.googleapis.com/tfhub-modules/goo
     rm -rf ${USE_MODEL}.tar.gz
 
 ENV SPACY_MODEL=en_core_web_lg
-RUN python3 -m spacy download ${SPACY_MODEL}
+RUN python -m spacy download ${SPACY_MODEL}
 
 WORKDIR ${MODEL_CACHE}/incorpbot/
 ENV INCORPBOT_MODEL=squad-2.0
@@ -24,7 +23,7 @@ RUN curl -O https://storage.googleapis.com/w210-incorpbot/models/${INCORPBOT_MOD
 WORKDIR /user/src/app
 
 COPY requirements.txt ./
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY data ./
 

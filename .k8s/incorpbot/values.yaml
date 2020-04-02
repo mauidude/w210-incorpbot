@@ -4,8 +4,10 @@
 
 replicaCount: 1
 
+version: latest
+
 image:
-  repository: us.gcr.io/w210-incorpbot/incorpbot
+  repository: 930446191589.dkr.ecr.us-west-2.amazonaws.com/w210-incorpbot/incorpbot
 
 imagePullSecrets: []
 nameOverride: ""
@@ -39,9 +41,11 @@ resources:
   limits:
     cpu: 2
     memory: 10G
+    nvidia.com/gpu: 1
   requests:
     cpu: 1
     memory: 8G
+
 
 elastic:
   host: https://elastic-es-default
@@ -51,11 +55,18 @@ elastic:
         name: elastic-es-elastic-user
         key: elastic
 
-nodeSelector: {}
-
-tolerations: []
-
 affinity: {}
 
 backend:
   timeoutSec: 300
+
+
+# if using GPUs (aws):
+gcp: false
+
+nodeSelector:
+  nvidia.com/gpu: "true"
+tolerations:
+- key: "nvidia.com/gpu"
+  operator: "Exists"
+  effect: "NoSchedule"

@@ -8,6 +8,7 @@ nodeSet:
   name: default
   master: true
   data: true
+  ingest: false
   ingress: true
   allow_mmap: false
   storage: 5G
