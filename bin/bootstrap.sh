@@ -15,7 +15,9 @@ mkdir -p $HOME/bin && cp ./aws-iam-authenticator $HOME/bin/aws-iam-authenticator
 aws-iam-authenticator help
 
 # kubectl auth
-aws eks --region us-west-2 update-kubeconfig --name incorpbot
+mkdir -p /var/lib/buildkite-agent/.kube
+aws eks --region us-west-2 update-kubeconfig --name incorpbot --kubeconfig /var/lib/buildkite-agent/.kube/config
+chown buildkite-agent:buildkite-agent /var/lib/buildkite-agent/.kube/config
 
 # install helm
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
