@@ -52,7 +52,7 @@ class Model(object):
         self.device = torch.device(
             "cuda" if torch.cuda.is_available() else "cpu")
 
-        logger.info('QA model using device: ', self.device)
+        logger.info('QA model using device: {self.device}')
         self.model.to(self.device)
 
         self.max_seq_length = max_seq_length

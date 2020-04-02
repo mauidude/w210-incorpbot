@@ -4,6 +4,8 @@
 
 replicaCount: 1
 
+version: latest
+
 image:
   repository: 930446191589.dkr.ecr.us-west-2.amazonaws.com/w210-incorpbot/incorpbot
 
