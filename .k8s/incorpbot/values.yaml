@@ -60,6 +60,8 @@ backend:
 
 
 # if using GPUs (aws):
+gcp: false
+
 nodeSelector:
   nvidia.com/gpu: "true"
 tolerations:
