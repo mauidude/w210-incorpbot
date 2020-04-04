@@ -63,10 +63,13 @@ class Home extends React.Component {
                     <h3>Supported States</h3>
 
                     <Row>
-                        <Col>
+                        <Col className="supported-states">
                             <Image className="flag california" alt="California" src="/images/flags/california_flag.png" fluid />
                             <span className="label">California</span>
                         </Col>
+                    </Row>
+                    <h4>Beta States</h4>
+                    <Row>
                         <Col>
                             <Image className="flag delaware" alt="Delaware" src="/images/flags/delaware_flag.png" fluid />
                             <span className="label">Delaware</span>
