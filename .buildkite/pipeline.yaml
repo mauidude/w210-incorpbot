@@ -8,7 +8,7 @@ steps:
 
   - label: build incorpbot
     command:
-      - "./bin/build.sh incorpbot"
+      - "./bin/build.sh incorpbot ."
     branches: "!master"
 
   - label: build app
