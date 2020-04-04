@@ -7,31 +7,11 @@ steps:
 
   - label: build incorpbot
     command:
-      - "./bin/build.sh incorpbot ."
+      - "./bin/build.sh incorpbot . && ./bin/push.sh incorpbot"
 
   - label: build app
     command:
-      - "./bin/build.sh app app/"
-
-  - wait
-
-  - block: push?
-    fields:
-      - select: push docker images?
-        key: PUSH
-        options:
-          - label: "Yes"
-            value: "yes"
-          - label: "No"
-            value: "no"
-
-  - label: check push
-    command:
-      - >
-        if [[ $(buildkite-agent meta-data get "PUSH") == "yes" ]]; then
-            ./bin/push.sh incorpbot
-            ./bin/push.sh app
-        fi
+      - "./bin/build.sh app app/ && ./bin/push.sh app"
 
   - wait
 
