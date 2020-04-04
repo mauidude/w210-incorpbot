@@ -2,33 +2,68 @@ steps:
   - label: validate json
     command:
       - "./bin/validate_json.py"
+    branches: "!master"
+
+  - wait
+
+  - label: build incorpbot
+    command:
+      - "./bin/build.sh incorpbot"
+    branches: "!master"
+
+  - label: build app
+    command:
+      - "./bin/build.sh app app/"
+    branches: "!master"
 
   - wait
 
   - label: build incorpbot
     command:
       - "./bin/build.sh incorpbot . && ./bin/push.sh incorpbot"
+    branches: "master"
 
   - label: build app
     command:
       - "./bin/build.sh app app/ && ./bin/push.sh app"
+    branches: "master"
 
   - wait
 
-  - block: deploy?
+  - block: deploy incorpbot?
     fields:
-      - select: Deploy new images?
+      - select: Deploy new incorpbot image?
         key: DEPLOY
         options:
           - label: "Yes"
             value: "yes"
           - label: "No"
             value: "no"
+    branches: "master"
 
-  - label: check deploy
+  - label: check deploy incorpbot
     command:
       - >
         if [[ $(buildkite-agent meta-data get "DEPLOY") == "yes" ]]; then
             ./bin/deploy.sh incorpbot
+        fi
+    branches: "master"
+
+  - block: deploy app?
+    fields:
+      - select: Deploy new app image?
+        key: DEPLOY
+        options:
+          - label: "Yes"
+            value: "yes"
+          - label: "No"
+            value: "no"
+    branches: "master"
+
+  - label: check deploy app
+    command:
+      - >
+        if [[ $(buildkite-agent meta-data get "DEPLOY") == "yes" ]]; then
             ./bin/deploy.sh app
         fi
+    branches: "master"
