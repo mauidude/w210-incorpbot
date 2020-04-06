@@ -48,7 +48,7 @@ class Chat extends React.Component {
 
     receiveMessage(data) {
         this.setState({
-            history: [...this.state.history, { message: data.message, sender: "you" }],
+            history: [...this.state.history, { message: data.message, sender: "you", html: data.html }],
         });
     }
 

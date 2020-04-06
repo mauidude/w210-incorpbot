@@ -256,6 +256,21 @@ def conversation_new():
          'conversation_id': str(uuid.uuid4()),
          })
 
+    emit('conversation:response', {
+        'message': '''
+            Here you can find answers to topics like:
+            <ul>
+                <li>Incorporation</li>
+                <li>Business Licenses</li>
+                <li>Business Structures</li>
+                <li>Intellectual Property</li>
+                <li>Taxes</li>
+                <li>And much more!</li>
+            </ul>
+            ''',
+        'html': True
+    })
+
     emit('conversation:response:end')
 
 

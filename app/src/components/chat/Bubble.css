@@ -2,13 +2,18 @@
     background-color: #5fc9f8;
     color: white;
     padding: 5px 15px;
-    border-radius: 20px;
+    border-radius: 11px;
     clear: both;
     max-width: 60%;
     margin-bottom: 5px;
     font-size: smaller;
     animation-name: bubble-appear;
     animation-duration: .75s;
+}
+
+.Bubble ul {
+    margin-left: 0;
+    padding-left: 10px;
 }
 
 @keyframes bubble-appear {

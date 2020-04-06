@@ -29,7 +29,7 @@ class History extends React.Component {
 
         return (
             <div className="History" ref={this.history}>
-                {this.props.dialog.map((item, key) => <Bubble key={key} message={item.message} sender={item.sender} />)}
+                {this.props.dialog.map((item, key) => <Bubble key={key} message={item.message} sender={item.sender} html={item.html} />)}
                 {pending}
             </div >
         );
